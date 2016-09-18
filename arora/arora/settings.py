@@ -83,7 +83,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'aad.apps.AadConfig',
-    'cadGIS.apps.CadgisConfig'
+    'cadGIS.apps.CadgisConfig',
+    'home.apps.HomeConfig'
 ]
 
 AUTHENTICATION_BACKENDS = (
