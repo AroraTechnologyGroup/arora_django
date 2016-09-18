@@ -15,17 +15,58 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# Application definition
+ROOT_URLCONF = r'arora.urls'
+LOGIN_URL = r'login/'
+LOGIN_REDIRECT_URL = r'/'
+
+FCGI_DEBUG = True
+FCGI_LOG = True
+FCGI_LOG_PATH = os.path.join(BASE_DIR, "logs")
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "aspmx.l.google.com"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'j#^lb@e-0=r2ysz&xu^6o58n2680iq%@zo)@&m_5c9p35(y(4m'
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = ["localhost", "127.0.0.1", ".aroraengineers.com"]
+CSRF_COOKIE_SECURE = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_REPLACE_HTTPS_REFERER = False
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'content-range',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken'
+)
+
+CORS_EXPOSE_HEADERS = (
+    'content-range',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CORS_ALLOW_CREDENTIALS = False
+    CORS_REPLACE_HTTPS_REFERER = True
+    CORS_ORIGIN_ALLOW_ALL = False
+
+ALLOWED_HOSTS = ['gisapps.aroraengineers.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -37,19 +78,34 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
+    'oauth2_provider',
+    'corsheaders',
+    'rest_framework',
+    'aad.apps.AadConfig',
+    'cadGIS.apps.CadgisConfig'
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'oauth2_provider.backends.OAuth2Backend',
+    'django.contrib.auth.backends.RemoteUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    #'corsheaders.middleware.CorsPostCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.PersistentRemoteUserMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'arora.urls'
 
 TEMPLATES = [
     {
@@ -75,6 +131,24 @@ WSGI_APPLICATION = 'arora.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
+    # 'azure_sql_server': {
+    #     'ENGINE': 'sql_server.pyodbc',
+    #     'NAME': 'eDocDiscovery',
+    #     'HOST': 'sql-server-azure.database.windows.net',
+    #     'USER': 'gissetup@sql-server-azure',
+    #     'PASSWORD': "Heddie01!",
+    #     'OPTIONS': {
+    #         'driver': 'SQL Server Native Client 11.0'
+    #      }
+    #  },
+    # 'postGres': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'rtaa_DRF',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'AroraGIS123',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '5432'
+    # },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -100,6 +174,77 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
+}
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 15,
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.OrderingFilter',
+        # 'rest_framework.filters.DjangoFilterBackend',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication',
+        #'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FileUploadParser',
+    )
+}
+
+LOGGING = {
+    # TODO - setup the email logging for running on IIS
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'INFO',
+            'formatter': 'standard'
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': "INFO",
+            'filename': os.path.join(BASE_DIR, 'logs/django_log.log'),
+            'maxBytes': 1024*1024*10,
+            'backupCount': 5,
+            'formatter': 'standard'
+        }
+    },
+    'loggers': {
+        '_fileApp': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propogate': True
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO'
+        }
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -113,9 +258,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
-
-STATIC_URL = '/static/'
