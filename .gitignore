@@ -2,6 +2,8 @@
 */logs/
 */db.sqlite3
 **/*/web.config
+arora/static/
+arora/media/
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
