@@ -18,16 +18,21 @@ def pull(path):
     proc = subprocess.Popen(git_cmd, **kwargs)
     (std_out, std_err) = proc.communicate()
 
-    python_path = os.path.join(BASE_DIR, r"venv\scripts\python.exe")
-    manage_script = os.path.join(BASE_DIR, "manage.py")
-    proc = subprocess.Popen([python_path, manage_script, "collectstatic --no-input"])
+    kwargs = dict()
+    kwargs['cwd'] = BASE_DIR
+    kwargs['stderr'] = PIPE
+    kwargs['stdout'] = PIPE
+    kwargs['universal_newlines'] = True
+    python_path = r"venv\scripts\python.exe"
+    manage_script = "manage.py"
+    proc = subprocess.Popen("{} {} collectstatic --no-input".format(python_path, manage_script), **kwargs)
     (out, err) = proc.communicate()
 
     connection = mail.get_connection()
     connection.open()
     send_mail(
         "Deploy ARORA to Staging",
-        "std_out: {} \n std_err: {} \n collectstatic: {}, err{}".format(std_out, std_err, out, err),
+        "std_out: {} \n std_err: {} \n collectstatic: {}, err: {}".format(std_out, std_err, out, err),
         "rhughes@aroraengineers.com",
         ["richardh522@gmail.com"],
         fail_silently=False,
