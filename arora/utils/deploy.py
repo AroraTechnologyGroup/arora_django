@@ -1,3 +1,5 @@
+import os
+from arora.settings import BASE_DIR
 import cgitb
 import subprocess
 from subprocess import PIPE
@@ -16,11 +18,16 @@ def pull(path):
     proc = subprocess.Popen(git_cmd, **kwargs)
     (std_out, std_err) = proc.communicate()
 
+    python_path = os.path.join(BASE_DIR, r"venv\scripts\python.exe")
+    manage_script = os.path.join(BASE_DIR, "manage.py")
+    proc = subprocess.Popen([python_path, manage_script, "collectstatic --no-input"])
+    (out, err) = proc.communicate()
+
     connection = mail.get_connection()
     connection.open()
     send_mail(
         "Deploy ARORA to Staging",
-        "std_out: {} \n std_err: {}".format(std_out, std_err),
+        "std_out: {} \n std_err: {} \n collectstatic: {}, err{}".format(std_out, std_err, out, err),
         "rhughes@aroraengineers.com",
         ["richardh522@gmail.com"],
         fail_silently=False,
