@@ -2,6 +2,7 @@
 */logs/
 */db.sqlite3
 tests/
+node_modules/
 **/*/web.config
 arora/static/
 arora/media/
