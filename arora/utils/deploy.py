@@ -1,4 +1,3 @@
-import os
 from arora.settings import BASE_DIR
 import cgitb
 import subprocess
@@ -32,7 +31,7 @@ def pull(path):
     connection.open()
     send_mail(
         "Deploy ARORA to Staging",
-        "std_out: {} \n std_err: {} \n collectstatic: {}, err: {}".format(std_out, std_err, out, err),
+        "std_out: {} \n std_err: {} \n collectstatic: {}\n err: {}".format(std_out, std_err, out, err),
         "rhughes@aroraengineers.com",
         ["richardh522@gmail.com"],
         fail_silently=False,
