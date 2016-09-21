@@ -20,7 +20,7 @@ class HomePage(APIView):
 
     def get(self, request, format=None):
         try:
-            if not request.META['REMOTE_USER'].is_authenticated():
+            if not request.META['REMOTE_USER']:
                 return redirect(reverse('home:login'))
         except KeyError:
             pass
