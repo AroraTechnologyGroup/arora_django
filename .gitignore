@@ -1,6 +1,7 @@
 .idea/
 */logs/
 */db.sqlite3
+tests/
 **/*/web.config
 arora/static/
 arora/media/

@@ -1,0 +1,13 @@
+{
+  "name": "arora-gis-application-development",
+  "version": "1.0.0",
+  "description": "GIS dev site for arora",
+  "scripts": {
+    "test": "intern-client config=tests/intern"
+  },
+  "author": "Richard Hughes at Arora Engineers, Inc.",
+  "license": "ISC",
+  "devDependencies": {
+    "intern": "^3.3.1"
+  }
+}
