@@ -19,7 +19,7 @@ class HomePage(APIView):
     template = r'home/main_content/main_content.html'
 
     def get(self, request, format=None):
-        
+
         if not request.user.is_authenticated():
             return redirect(reverse('home:login'))
 
