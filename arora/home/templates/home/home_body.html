@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" type="text/css" href="../../static/home/app.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/home/app.css"/>
     <link rel="stylesheet" type="text/css" href="../static/home/app/resources/app.css"/>
 {% endblock %}
 
@@ -59,7 +59,7 @@
                                 {% load admin_urls %}
                                 <a class="dropdown-link" href="{% url 'admin:index' %}">Admin Site</a>
                             {% endif %}
-                            <a class="dropdown-link" href="/help">Support</a>
+                            <a class="dropdown-link" href="/">Support</a>
                             <a class="dropdown-link" href="{% url 'home:logout' %}">Logout</a>
                         </nav>
                     </div>
@@ -93,8 +93,6 @@
 {% block content %}
     <div class="grid-container">
         <div id="main-content" class="column-24">
-            {% block main_content %}
-            {% endblock %}
         </div>
     </div>
 {% endblock %}

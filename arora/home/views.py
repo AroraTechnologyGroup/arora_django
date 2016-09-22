@@ -16,7 +16,7 @@ class HomePage(APIView):
     """View that renders the opening homepage"""
     renderer_classes = (TemplateHTMLRenderer,)
     permission_classes = (AllowAny,)
-    template = r'home/main_content/main_content.html'
+    template = r'home/home_body.html'
 
     def get(self, request, format=None):
 
